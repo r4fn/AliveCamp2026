@@ -2,12 +2,16 @@ import pandas as pd
 import json
 import sys
 from pathlib import Path
+from datetime import datetime
 
 # ── Lê a planilha ─────────────────────────────────────────────────────────────
 xlsx_path = Path("dados/123.xlsx")
 if not xlsx_path.exists():
-    print("ERRO: arquivo dados/inscricoes.xlsx não encontrado.")
+    print("ERRO: arquivo dados/123.xlsx não encontrado.")
     sys.exit(1)
+
+timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+data_exibir = datetime.now().strftime('%d/%m/%Y %H:%M')
 
 df = pd.read_excel(xlsx_path)
 
@@ -51,7 +55,6 @@ for k, v in pagamentos_raw.items():
     elif 'DIÁRIA' in str(k):    pagamentos['Diária PIX'] = pagamentos.get('Diária PIX', 0) + v
 
 # Timeline por mês
-real['mes_str'] = real['Carimbo de data/hora'].dt.strftime('%b/%Y')
 real['mes_ord'] = real['Carimbo de data/hora'].dt.to_period('M')
 timeline = (
     real.groupby('mes_ord')
@@ -65,34 +68,17 @@ timeline_data = [
     for _, row in timeline.iterrows()
 ]
 
-# ── Monta o JSON de dados ──────────────────────────────────────────────────────
-dados = {
-    "total_inscritos":  total_inscritos,
-    "total_pago":       round(total_pago, 2),
-    "total_falta":      round(total_falta, 2),
-    "total_previsto":   round(total_previsto, 2),
-    "total_igrejas":    total_igrejas,
-    "quitados":         quitados,
-    "pendentes":        pendentes,
-    "igrejas":          igrejas,
-    "faixas":           faixas,
-    "pagamentos":       pagamentos,
-    "timeline":         timeline_data,
-}
-
 # ── Percentuais ───────────────────────────────────────────────────────────────
 pct_pago  = round(total_pago  / total_previsto * 100) if total_previsto > 0 else 0
 pct_falta = round(total_falta / total_previsto * 100) if total_previsto > 0 else 0
 
-# Igreja líder
 igreja_lider = list(igrejas.keys())[0] if igrejas else "—"
 pct_lider    = round(list(igrejas.values())[0] / total_inscritos * 100) if total_inscritos > 0 else 0
 
-# Timeline: últimos 2 meses
 ultimos = timeline_data[-2:] if len(timeline_data) >= 2 else timeline_data
 pct_ultimos = round(sum(m['count'] for m in ultimos) / total_inscritos * 100) if total_inscritos > 0 else 0
 
-# Igrejas para HTML
+# Igrejas HTML
 igrejas_html = ""
 max_val = max(igrejas.values()) if igrejas else 1
 cores_extra = ['#a78bfa', '#ff6b6b', '#4fc3f7', '#f6c90e']
@@ -125,16 +111,12 @@ for i, m in enumerate(timeline_data):
         <span class="tl-label">{label_br}{star}</span>
       </div>"""
 
-# Dados JS
-faixas_labels = list(faixas.keys())
-faixas_values = list(faixas.values())
-pag_labels    = list(pagamentos.keys())
-pag_values    = list(pagamentos.values())
+faixas_labels = json.dumps(list(faixas.keys()))
+faixas_values = json.dumps(list(faixas.values()))
+pag_labels    = json.dumps(list(pagamentos.keys()))
+pag_values    = json.dumps(list(pagamentos.values()))
 
 # ── Gera o HTML ───────────────────────────────────────────────────────────────
-from datetime import datetime
-timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
-
 html = f"""<!DOCTYPE html>
 <html lang="pt-BR" data-gerado="{timestamp}">
 <head>
@@ -381,15 +363,15 @@ html = f"""<!DOCTYPE html>
   </div>
 
   <div class="footer">
-    ALIVE CAMP · 12ª EDIÇÃO · {total_inscritos} inscrições confirmadas · Atualizado automaticamente
+    ALIVE CAMP · 12ª EDIÇÃO · {total_inscritos} inscrições · Atualizado em {data_exibir}
   </div>
 
 </div>
 <script>
-var faixasLabels = {json.dumps(faixas_labels)};
-var faixasValues = {json.dumps(faixas_values)};
-var pagLabels    = {json.dumps(pag_labels)};
-var pagValues    = {json.dumps(pag_values)};
+var faixasLabels = {faixas_labels};
+var faixasValues = {faixas_values};
+var pagLabels    = {pag_labels};
+var pagValues    = {pag_values};
 var totalInscritos = {total_inscritos};
 
 Chart.defaults.color = '#8b949e';
@@ -409,7 +391,6 @@ function initCharts() {{
   }}
   sizeCanvas(canvasAge);
   sizeCanvas(canvasPay);
-
   new Chart(canvasAge.getContext('2d'), {{
     type: 'bar',
     data: {{
@@ -417,7 +398,7 @@ function initCharts() {{
       datasets: [{{
         data: faixasValues,
         backgroundColor: ['rgba(79,195,247,.7)','rgba(167,139,250,.7)','rgba(61,220,132,.7)','rgba(246,201,14,.8)','rgba(255,107,107,.7)'],
-        borderColor:     ['#4fc3f7','#a78bfa','#3ddc84','#f6c90e','#ff6b6b'],
+        borderColor: ['#4fc3f7','#a78bfa','#3ddc84','#f6c90e','#ff6b6b'],
         borderWidth: 1.5, borderRadius: 6
       }}]
     }},
@@ -430,7 +411,6 @@ function initCharts() {{
       }}
     }}
   }});
-
   new Chart(canvasPay.getContext('2d'), {{
     type: 'doughnut',
     data: {{
@@ -450,24 +430,24 @@ function initCharts() {{
     }}
   }});
 }}
-
 if (document.readyState === 'loading') {{
   document.addEventListener('DOMContentLoaded', initCharts);
 }} else {{
   initCharts();
 }}
-</script>
-<script>
-document.addEventListener('visibilitychange', function() {
-  if (!document.hidden) {
-    fetch(window.location.href + '?v=' + Date.now(), {{ cache: 'no-store' }})
+
+// Auto-reload quando site atualizar
+document.addEventListener('visibilitychange', function() {{
+  if (!document.hidden) {{
+    fetch(window.location.href + '?nocache=' + Date.now(), {{ cache: 'no-store' }})
       .then(function(r) {{ return r.text(); }})
       .then(function(html) {{
-        var remoto = html.match(/data-gerado="([^"]+)"/);
-        var local  = document.documentElement.getAttribute('data-gerado');
-        if (remoto && remoto[1] !== local) {{ window.location.reload(true); }}
-      }});
-  }
+        var m = html.match(/data-gerado="([^"]+)"/);
+        var local = document.documentElement.getAttribute('data-gerado');
+        if (m && m[1] !== local) {{ window.location.reload(true); }}
+      }})
+      .catch(function() {{}});
+  }}
 }});
 </script>
 </body>
@@ -475,4 +455,4 @@ document.addEventListener('visibilitychange', function() {
 
 output_path = Path("index.html")
 output_path.write_text(html, encoding="utf-8")
-print(f"✅ index.html gerado com sucesso! ({total_inscritos} inscritos, R${total_previsto:,.0f} previsto)")
+print(f"✅ index.html gerado! ({total_inscritos} inscritos, R${total_previsto:,.0f} previsto, ts={timestamp})")
