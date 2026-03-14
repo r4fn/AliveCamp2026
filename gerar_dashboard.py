@@ -132,8 +132,11 @@ pag_labels    = list(pagamentos.keys())
 pag_values    = list(pagamentos.values())
 
 # ── Gera o HTML ───────────────────────────────────────────────────────────────
+from datetime import datetime
+timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
+
 html = f"""<!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-gerado="{timestamp}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -453,6 +456,19 @@ if (document.readyState === 'loading') {{
 }} else {{
   initCharts();
 }}
+</script>
+<script>
+document.addEventListener('visibilitychange', function() {
+  if (!document.hidden) {
+    fetch(window.location.href + '?v=' + Date.now(), {{ cache: 'no-store' }})
+      .then(function(r) {{ return r.text(); }})
+      .then(function(html) {{
+        var remoto = html.match(/data-gerado="([^"]+)"/);
+        var local  = document.documentElement.getAttribute('data-gerado');
+        if (remoto && remoto[1] !== local) {{ window.location.reload(true); }}
+      }});
+  }
+}});
 </script>
 </body>
 </html>"""
