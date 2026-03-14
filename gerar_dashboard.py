@@ -4,7 +4,7 @@ import sys
 from pathlib import Path
 
 # ── Lê a planilha ─────────────────────────────────────────────────────────────
-xlsx_path = Path("dados/inscricoes.xlsx")
+xlsx_path = Path("dados/123.xlsx")
 if not xlsx_path.exists():
     print("ERRO: arquivo dados/inscricoes.xlsx não encontrado.")
     sys.exit(1)
