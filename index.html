@@ -8,186 +8,105 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
   :root {
-    --bg: #0d1117;
-    --surface: #161b22;
-    --surface2: #1e2530;
-    --border: #2d3748;
-    --gold: #f6c90e;
-    --green: #3ddc84;
-    --coral: #ff6b6b;
-    --sky: #4fc3f7;
-    --purple: #a78bfa;
-    --text: #e6edf3;
-    --muted: #8b949e;
+    --bg:#0d1117;--surface:#161b22;--surface2:#1e2530;--border:#2d3748;
+    --gold:#f6c90e;--green:#3ddc84;--coral:#ff6b6b;--sky:#4fc3f7;
+    --purple:#a78bfa;--text:#e6edf3;--muted:#8b949e;
   }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Outfit', sans-serif;
-    min-height: 100vh;
-    overflow-x: hidden;
-  }
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image:
-      radial-gradient(ellipse at 20% 20%, rgba(246,201,14,0.06) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 80%, rgba(61,220,132,0.05) 0%, transparent 50%),
-      radial-gradient(ellipse at 50% 50%, rgba(79,195,247,0.03) 0%, transparent 70%);
-    pointer-events: none;
-    z-index: 0;
-  }
-  .container {
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 40px 24px;
-    position: relative;
-    z-index: 1;
-  }
-  .header { text-align: center; margin-bottom: 48px; }
-  .header-badge {
-    display: inline-block;
-    font-family: 'DM Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--gold);
-    border: 1px solid rgba(246,201,14,0.3);
-    padding: 6px 18px;
-    border-radius: 20px;
-    margin-bottom: 16px;
-    background: rgba(246,201,14,0.05);
-  }
-  .header h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(36px, 6vw, 72px);
-    font-weight: 900;
-    line-height: 1;
-    letter-spacing: -2px;
-    background: linear-gradient(135deg, #f6c90e 0%, #ffffff 50%, #3ddc84 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 10px;
-  }
-  .header-sub { font-size: 15px; color: var(--muted); letter-spacing: 1px; font-weight: 300; }
-  .header-line { width: 80px; height: 3px; background: linear-gradient(90deg, var(--gold), var(--green)); margin: 20px auto 0; border-radius: 2px; }
-
-  .hero-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
-  .hero-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 24px;
-    position: relative;
-    overflow: hidden;
-    transition: transform 0.2s, border-color 0.2s;
-    animation: fadeUp 0.5s ease both;
-  }
-  .hero-card:hover { transform: translateY(-3px); border-color: rgba(246,201,14,0.3); }
-  .hero-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
-  .hero-card.gold::before { background: var(--gold); }
-  .hero-card.green::before { background: var(--green); }
-  .hero-card.coral::before { background: var(--coral); }
-  .hero-card.sky::before { background: var(--sky); }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--text);font-family:'Outfit',sans-serif;min-height:100vh;overflow-x:hidden}
+  body::before{content:'';position:fixed;inset:0;background-image:
+    radial-gradient(ellipse at 20% 20%,rgba(246,201,14,.06) 0%,transparent 50%),
+    radial-gradient(ellipse at 80% 80%,rgba(61,220,132,.05) 0%,transparent 50%);
+    pointer-events:none;z-index:0}
+  .container{max-width:1280px;margin:0 auto;padding:40px 24px;position:relative;z-index:1}
+  .header{text-align:center;margin-bottom:48px}
+  .header-badge{display:inline-block;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:3px;
+    text-transform:uppercase;color:var(--gold);border:1px solid rgba(246,201,14,.3);
+    padding:6px 18px;border-radius:20px;margin-bottom:16px;background:rgba(246,201,14,.05)}
+  .header h1{font-family:'Playfair Display',serif;font-size:clamp(36px,6vw,72px);font-weight:900;
+    line-height:1;letter-spacing:-2px;background:linear-gradient(135deg,#f6c90e 0%,#fff 50%,#3ddc84 100%);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:10px}
+  .header-sub{font-size:15px;color:var(--muted);letter-spacing:1px;font-weight:300}
+  .header-line{width:80px;height:3px;background:linear-gradient(90deg,var(--gold),var(--green));
+    margin:20px auto 0;border-radius:2px}
+  .hero-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+  .hero-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;
+    padding:24px;position:relative;overflow:hidden;transition:transform .2s,border-color .2s;
+    animation:fadeUp .5s ease both}
+  .hero-card:hover{transform:translateY(-3px);border-color:rgba(246,201,14,.3)}
+  .hero-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+  .hero-card.gold::before{background:var(--gold)}
+  .hero-card.green::before{background:var(--green)}
+  .hero-card.coral::before{background:var(--coral)}
+  .hero-card.sky::before{background:var(--sky)}
   .hero-card:nth-child(1){animation-delay:.05s}
   .hero-card:nth-child(2){animation-delay:.10s}
   .hero-card:nth-child(3){animation-delay:.15s}
   .hero-card:nth-child(4){animation-delay:.20s}
-  .hero-icon { font-size: 28px; margin-bottom: 12px; display: block; }
-  .hero-value { font-family: 'Playfair Display', serif; font-size: 38px; font-weight: 700; line-height: 1; margin-bottom: 6px; }
-  .hero-card.gold .hero-value { color: var(--gold); }
-  .hero-card.green .hero-value { color: var(--green); }
-  .hero-card.coral .hero-value { color: var(--coral); }
-  .hero-card.sky .hero-value { color: var(--sky); }
-  .hero-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; font-weight: 500; }
-
-  .insights-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 24px; }
-  .insight-pill {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 16px 20px;
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-    animation: fadeUp 0.5s .25s ease both;
-  }
-  .insight-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
-  .insight-text { font-size: 13px; color: var(--muted); line-height: 1.5; }
-  .insight-text strong { color: var(--text); display: block; margin-bottom: 2px; }
-
-  .chart-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 28px;
-    animation: fadeUp 0.5s .3s ease both;
-  }
-  .chart-title { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; margin-bottom: 4px; }
-  .chart-subtitle { font-size: 12px; color: var(--muted); margin-bottom: 22px; font-weight: 300; }
-
-  .grid-wide { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 20px; }
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
-
-  .finance-bar {
-    background: var(--surface2);
-    border-radius: 12px;
-    padding: 18px 22px;
-    margin-bottom: 14px;
-    display: flex;
-    align-items: center;
-    gap: 24px;
-  }
-  .finance-info { min-width: 120px; }
-  .finance-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
-  .finance-value { font-family: 'DM Mono', monospace; font-size: 22px; font-weight: 500; }
-  .finance-track { flex: 2; }
-  .progress-bg { background: var(--border); border-radius: 99px; height: 8px; overflow: hidden; margin-bottom: 5px; }
-  .progress-fill { height: 100%; border-radius: 99px; }
-  .progress-label { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; }
-
-  .church-list { list-style: none; }
-  .church-item { display: flex; align-items: center; gap: 10px; padding: 9px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
-  .church-item:last-child { border-bottom: none; }
-  .church-rank { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); width: 20px; text-align: right; }
-  .church-bar-bg { flex: 1; background: var(--border); border-radius: 4px; height: 6px; overflow: hidden; }
-  .church-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--gold), var(--green)); }
-  .church-name { font-size: 13px; font-weight: 500; min-width: 130px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .church-count { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--gold); font-weight: 500; min-width: 24px; text-align: right; }
-
-  .badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; padding: 4px 10px; border-radius: 20px; font-weight: 500; }
-  .badge.warning { background: rgba(255,107,107,0.15); color: var(--coral); border: 1px solid rgba(255,107,107,0.2); }
-  .badge.success { background: rgba(61,220,132,0.1); color: var(--green); border: 1px solid rgba(61,220,132,0.2); }
-  .badge.yellow { background: rgba(246,201,14,0.1); color: var(--gold); border: 1px solid rgba(246,201,14,0.2); }
-
-  .timeline-wrap {
-    display: flex;
-    align-items: flex-end;
-    gap: 10px;
-    height: 130px;
-    margin-top: 16px;
-    padding-bottom: 32px;
-    position: relative;
-  }
-  .tl-col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; gap: 4px; }
-  .tl-num { font-family: 'DM Mono', monospace; font-size: 11px; }
-  .tl-bar { width: 100%; border-radius: 4px 4px 0 0; min-height: 4px; }
-  .tl-label { font-size: 10px; color: var(--muted); font-family: 'DM Mono', monospace; margin-top: 8px; text-align: center; }
-  .tl-grid { position: absolute; bottom: 32px; left: 0; right: 0; height: 1px; background: rgba(255,255,255,0.05); }
-
-  .footer { text-align: center; padding: 28px 0 12px; font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; border-top: 1px solid var(--border); margin-top: 8px; letter-spacing: 1px; }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(18px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  @media (max-width: 900px) {
-    .hero-grid { grid-template-columns: repeat(2, 1fr); }
-    .grid-wide, .grid-2 { grid-template-columns: 1fr; }
-    .insights-grid { grid-template-columns: 1fr; }
+  .hero-icon{font-size:28px;margin-bottom:12px;display:block}
+  .hero-value{font-family:'Playfair Display',serif;font-size:38px;font-weight:700;line-height:1;margin-bottom:6px}
+  .hero-card.gold .hero-value{color:var(--gold)}
+  .hero-card.green .hero-value{color:var(--green)}
+  .hero-card.coral .hero-value{color:var(--coral)}
+  .hero-card.sky .hero-value{color:var(--sky)}
+  .hero-label{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;font-weight:500}
+  .insights-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px}
+  .insight-pill{background:var(--surface2);border:1px solid var(--border);border-radius:12px;
+    padding:16px 20px;display:flex;align-items:flex-start;gap:12px;
+    animation:fadeUp .5s .25s ease both}
+  .insight-icon{font-size:20px;flex-shrink:0;margin-top:2px}
+  .insight-text{font-size:13px;color:var(--muted);line-height:1.5}
+  .insight-text strong{color:var(--text);display:block;margin-bottom:2px}
+  .chart-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;
+    padding:28px;animation:fadeUp .5s .3s ease both}
+  .chart-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:4px}
+  .chart-subtitle{font-size:12px;color:var(--muted);margin-bottom:22px;font-weight:300}
+  .grid-wide{display:grid;grid-template-columns:2fr 1fr;gap:20px;margin-bottom:20px}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px}
+  .finance-bar{background:var(--surface2);border-radius:12px;padding:18px 22px;
+    margin-bottom:14px;display:flex;align-items:center;gap:24px}
+  .finance-info{min-width:120px}
+  .finance-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+  .finance-value{font-family:'DM Mono',monospace;font-size:22px;font-weight:500}
+  .finance-track{flex:2}
+  .progress-bg{background:var(--border);border-radius:99px;height:8px;overflow:hidden;margin-bottom:5px}
+  .progress-fill{height:100%;border-radius:99px}
+  .progress-label{font-size:11px;color:var(--muted);font-family:'DM Mono',monospace}
+  .church-list{list-style:none}
+  .church-item{display:flex;align-items:center;gap:10px;padding:9px 0;
+    border-bottom:1px solid rgba(255,255,255,.04)}
+  .church-item:last-child{border-bottom:none}
+  .church-rank{font-family:'DM Mono',monospace;font-size:11px;color:var(--muted);
+    width:20px;text-align:right}
+  .church-bar-bg{flex:1;background:var(--border);border-radius:4px;height:6px;overflow:hidden}
+  .church-bar-fill{height:100%;border-radius:4px}
+  .church-name{font-size:13px;font-weight:500;min-width:130px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .church-count{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;
+    min-width:24px;text-align:right}
+  .badge{display:inline-flex;align-items:center;gap:5px;font-size:11px;
+    padding:4px 10px;border-radius:20px;font-weight:500}
+  .badge.warning{background:rgba(255,107,107,.15);color:var(--coral);border:1px solid rgba(255,107,107,.2)}
+  .badge.success{background:rgba(61,220,132,.1);color:var(--green);border:1px solid rgba(61,220,132,.2)}
+  .badge.yellow{background:rgba(246,201,14,.1);color:var(--gold);border:1px solid rgba(246,201,14,.2)}
+  .timeline-wrap{display:flex;align-items:flex-end;gap:10px;height:130px;
+    margin-top:16px;padding-bottom:32px;position:relative}
+  .tl-col{flex:1;display:flex;flex-direction:column;align-items:center;
+    justify-content:flex-end;height:100%;gap:4px}
+  .tl-num{font-family:'DM Mono',monospace;font-size:11px}
+  .tl-bar{width:100%;border-radius:4px 4px 0 0;min-height:4px}
+  .tl-label{font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;
+    margin-top:8px;text-align:center}
+  .tl-grid{position:absolute;bottom:32px;left:0;right:0;height:1px;
+    background:rgba(255,255,255,.05)}
+  .footer{text-align:center;padding:28px 0 12px;font-size:11px;color:var(--muted);
+    font-family:'DM Mono',monospace;border-top:1px solid var(--border);
+    margin-top:8px;letter-spacing:1px}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+  @media(max-width:900px){
+    .hero-grid{grid-template-columns:repeat(2,1fr)}
+    .grid-wide,.grid-2{grid-template-columns:1fr}
+    .insights-grid{grid-template-columns:1fr}
   }
 </style>
 </head>
@@ -209,12 +128,12 @@
     </div>
     <div class="hero-card green">
       <span class="hero-icon">💰</span>
-      <div class="hero-value">R$5,1k</div>
+      <div class="hero-value">R$5,082</div>
       <div class="hero-label">Total Arrecadado</div>
     </div>
     <div class="hero-card coral">
       <span class="hero-icon">⏳</span>
-      <div class="hero-value">R$6,7k</div>
+      <div class="hero-value">R$6,748</div>
       <div class="hero-label">Ainda a Receber</div>
     </div>
     <div class="hero-card sky">
@@ -229,21 +148,21 @@
       <span class="insight-icon">🚨</span>
       <div class="insight-text">
         <strong>Alta inadimplência</strong>
-        67% dos inscritos (41 pessoas) ainda têm saldo em aberto — cobrança urgente
+        67% dos inscritos (41 pessoas) ainda têm saldo em aberto
       </div>
     </div>
     <div class="insight-pill">
       <span class="insight-icon">📅</span>
       <div class="insight-text">
         <strong>Corrida de última hora</strong>
-        Fev e Mar concentram 69% das inscrições — maioria se inscreveu com pouco tempo de antecedência
+        Mar/26 e Feb/26 concentram 69% das inscrições
       </div>
     </div>
     <div class="insight-pill">
       <span class="insight-icon">🏠</span>
       <div class="insight-text">
         <strong>Domínio local</strong>
-        IPB-SMA lidera com 43% das inscrições — potencial para crescer nas demais igrejas
+        IPB - SMA lidera com 43% das inscrições
       </div>
     </div>
   </div>
@@ -251,45 +170,40 @@
   <div class="grid-wide">
     <div class="chart-card">
       <div class="chart-title">💵 Situação Financeira</div>
-      <div class="chart-subtitle">Arrecadação vs. pendências · inclui 2 pagamentos avulsos</div>
-
+      <div class="chart-subtitle">Arrecadação vs. pendências</div>
       <div class="finance-bar">
         <div class="finance-info">
           <div class="finance-label">Recebido</div>
-          <div class="finance-value" style="color:var(--green)">R$ 5.082</div>
+          <div class="finance-value" style="color:var(--green)">R$ 5,082</div>
         </div>
         <div class="finance-track">
           <div class="progress-bg"><div class="progress-fill" style="width:43%;background:var(--green)"></div></div>
           <div class="progress-label">43% do total esperado</div>
         </div>
       </div>
-
       <div class="finance-bar">
         <div class="finance-info">
           <div class="finance-label">A Receber</div>
-          <div class="finance-value" style="color:var(--coral)">R$ 6.748</div>
+          <div class="finance-value" style="color:var(--coral)">R$ 6,748</div>
         </div>
         <div class="finance-track">
           <div class="progress-bg"><div class="progress-fill" style="width:57%;background:var(--coral)"></div></div>
           <div class="progress-label">57% ainda pendente</div>
         </div>
       </div>
-
       <div class="finance-bar" style="margin-bottom:0">
         <div class="finance-info">
           <div class="finance-label">Total Previsto</div>
-          <div class="finance-value" style="color:var(--gold)">R$ 11.830</div>
+          <div class="finance-value" style="color:var(--gold)">R$ 11,830</div>
         </div>
         <div class="finance-track">
           <div class="progress-bg"><div class="progress-fill" style="width:100%;background:linear-gradient(90deg,var(--gold),var(--green))"></div></div>
           <div class="progress-label">receita esperada total</div>
         </div>
       </div>
-
       <div style="margin-top:20px;display:flex;gap:8px;flex-wrap:wrap;">
         <span class="badge success">✓ 20 quitados</span>
         <span class="badge warning">⚠ 41 com pendências</span>
-        <span class="badge yellow">+ 2 pag. avulsos</span>
       </div>
     </div>
 
@@ -299,41 +213,52 @@
       <ul class="church-list">
         <li class="church-item">
           <span class="church-rank">#1</span>
-          <span class="church-name">IPB – SMA</span>
-          <div class="church-bar-bg"><div class="church-bar-fill" style="width:100%"></div></div>
-          <span class="church-count">26</span>
+          <span class="church-name">IPB - SMA</span>
+          <div class="church-bar-bg"><div class="church-bar-fill" style="width:100%;background:linear-gradient(90deg, #f6c90e, #3ddc84)"></div></div>
+          <span class="church-count" style="color:#f6c90e">26</span>
         </li>
         <li class="church-item">
           <span class="church-rank">#2</span>
-          <span class="church-name">IPB – Itu</span>
-          <div class="church-bar-bg"><div class="church-bar-fill" style="width:54%"></div></div>
-          <span class="church-count">14</span>
+          <span class="church-name">IPB - Itu</span>
+          <div class="church-bar-bg"><div class="church-bar-fill" style="width:54%;background:linear-gradient(90deg, #f6c90e, #3ddc84)"></div></div>
+          <span class="church-count" style="color:#f6c90e">14</span>
         </li>
         <li class="church-item">
           <span class="church-rank">#3</span>
-          <span class="church-name">Galpão 3.16</span>
-          <div class="church-bar-bg"><div class="church-bar-fill" style="width:31%"></div></div>
-          <span class="church-count">8</span>
+          <span class="church-name">Galpão 3.16 - Sorocaba</span>
+          <div class="church-bar-bg"><div class="church-bar-fill" style="width:31%;background:linear-gradient(90deg, #f6c90e, #3ddc84)"></div></div>
+          <span class="church-count" style="color:#f6c90e">8</span>
         </li>
         <li class="church-item">
           <span class="church-rank">#4</span>
-          <span class="church-name">IP Jd Licinia</span>
-          <div class="church-bar-bg"><div class="church-bar-fill" style="width:27%"></div></div>
-          <span class="church-count">7</span>
+          <span class="church-name">IP Jd Licinia - Campinas</span>
+          <div class="church-bar-bg"><div class="church-bar-fill" style="width:27%;background:linear-gradient(90deg, #f6c90e, #3ddc84)"></div></div>
+          <span class="church-count" style="color:#f6c90e">7</span>
         </li>
         <li class="church-item">
           <span class="church-rank">#5</span>
-          <span class="church-name">IPB Pilar do Sul</span>
-          <div class="church-bar-bg"><div class="church-bar-fill" style="width:8%"></div></div>
-          <span class="church-count">2</span>
+          <span class="church-name">IPB - Pilar do Sul</span>
+          <div class="church-bar-bg"><div class="church-bar-fill" style="width:8%;background:linear-gradient(90deg, #f6c90e, #3ddc84)"></div></div>
+          <span class="church-count" style="color:#f6c90e">2</span>
         </li>
         <li class="church-item">
           <span class="church-rank">—</span>
-          <span class="church-name" style="color:var(--muted)">Outras (4)</span>
-          <div class="church-bar-bg"><div class="church-bar-fill" style="width:15%;background:var(--purple)"></div></div>
-          <span class="church-count" style="color:var(--purple)">4</span>
+          <span class="church-name">Calvario - CIDADE?</span>
+          <div class="church-bar-bg"><div class="church-bar-fill" style="width:4%;background:linear-gradient(90deg, #a78bfa, #a78bfa88)"></div></div>
+          <span class="church-count" style="color:#a78bfa">1</span>
         </li>
-      </ul>
+        <li class="church-item">
+          <span class="church-rank">—</span>
+          <span class="church-name">Igreja Batista Água Viva - CIDADE?</span>
+          <div class="church-bar-bg"><div class="church-bar-fill" style="width:4%;background:linear-gradient(90deg, #ff6b6b, #ff6b6b88)"></div></div>
+          <span class="church-count" style="color:#ff6b6b">1</span>
+        </li>
+        <li class="church-item">
+          <span class="church-rank">—</span>
+          <span class="church-name">São Miguel Arcanjo </span>
+          <div class="church-bar-bg"><div class="church-bar-fill" style="width:4%;background:linear-gradient(90deg, #4fc3f7, #4fc3f788)"></div></div>
+          <span class="church-count" style="color:#4fc3f7">1</span>
+        </li></ul>
     </div>
   </div>
 
@@ -347,7 +272,7 @@
     </div>
     <div class="chart-card">
       <div class="chart-title">💳 Formas de Participação</div>
-      <div class="chart-subtitle">Como os 61 inscritos escolheram pagar</div>
+      <div class="chart-subtitle">Como os inscritos escolheram pagar</div>
       <div style="position:relative;width:100%;height:230px;min-height:230px;display:block;-webkit-transform:translateZ(0)">
         <canvas id="chartPay" width="600" height="230" style="display:block;width:100%;height:100%"></canvas>
       </div>
@@ -356,63 +281,68 @@
 
   <div class="chart-card" style="margin-bottom:20px">
     <div class="chart-title">📅 Inscrições por Mês</div>
-    <div class="chart-subtitle">Evolução temporal · Out/2025 → Mar/2026</div>
+    <div class="chart-subtitle">Evolução temporal das inscrições</div>
     <div class="timeline-wrap">
+      
       <div class="tl-col">
-        <span class="tl-num" style="color:var(--muted)">1</span>
-        <div class="tl-bar" style="height:5%;background:linear-gradient(180deg,rgba(139,148,158,0.7),rgba(139,148,158,0.2))"></div>
-        <span class="tl-label">Out<br>2025</span>
+        <span class="tl-num" style="color:rgba(139,148,158,0.7)">1</span>
+        <div class="tl-bar" style="height:5%;background:linear-gradient(180deg,rgba(139,148,158,0.7),rgba(139,148,158,0.7)33)"></div>
+        <span class="tl-label">Oct<br>25</span>
       </div>
       <div class="tl-col">
-        <span class="tl-num" style="color:var(--sky)">9</span>
-        <div class="tl-bar" style="height:43%;background:linear-gradient(180deg,var(--sky),rgba(79,195,247,0.2))"></div>
-        <span class="tl-label">Nov</span>
+        <span class="tl-num" style="color:#4fc3f7">9</span>
+        <div class="tl-bar" style="height:43%;background:linear-gradient(180deg,#4fc3f7,#4fc3f733)"></div>
+        <span class="tl-label">Nov<br>25</span>
       </div>
       <div class="tl-col">
-        <span class="tl-num" style="color:var(--purple)">3</span>
-        <div class="tl-bar" style="height:14%;background:linear-gradient(180deg,var(--purple),rgba(167,139,250,0.2))"></div>
-        <span class="tl-label">Dez</span>
+        <span class="tl-num" style="color:#a78bfa">3</span>
+        <div class="tl-bar" style="height:14%;background:linear-gradient(180deg,#a78bfa,#a78bfa33)"></div>
+        <span class="tl-label">Dec<br>25</span>
       </div>
       <div class="tl-col">
-        <span class="tl-num" style="color:var(--sky)">6</span>
-        <div class="tl-bar" style="height:29%;background:linear-gradient(180deg,var(--sky),rgba(79,195,247,0.2))"></div>
-        <span class="tl-label">Jan<br>2026</span>
+        <span class="tl-num" style="color:#4fc3f7">6</span>
+        <div class="tl-bar" style="height:29%;background:linear-gradient(180deg,#4fc3f7,#4fc3f733)"></div>
+        <span class="tl-label">Jan<br>26</span>
       </div>
       <div class="tl-col">
-        <span class="tl-num" style="color:var(--gold)">21</span>
-        <div class="tl-bar" style="height:100%;background:linear-gradient(180deg,var(--gold),rgba(246,201,14,0.3))"></div>
-        <span class="tl-label">Fev ⚡</span>
+        <span class="tl-num" style="color:#f6c90e">21</span>
+        <div class="tl-bar" style="height:100%;background:linear-gradient(180deg,#f6c90e,#f6c90e33)"></div>
+        <span class="tl-label">Feb<br>26 ⚡</span>
       </div>
       <div class="tl-col">
-        <span class="tl-num" style="color:var(--green)">21</span>
-        <div class="tl-bar" style="height:100%;background:linear-gradient(180deg,var(--green),rgba(61,220,132,0.3))"></div>
-        <span class="tl-label">Mar ⚡</span>
+        <span class="tl-num" style="color:#3ddc84">21</span>
+        <div class="tl-bar" style="height:100%;background:linear-gradient(180deg,#3ddc84,#3ddc8433)"></div>
+        <span class="tl-label">Mar<br>26 ⚡</span>
       </div>
       <div class="tl-grid"></div>
     </div>
   </div>
 
   <div class="footer">
-    ALIVE CAMP · 12ª EDIÇÃO · 61 inscrições confirmadas · Dados corrigidos
+    ALIVE CAMP · 12ª EDIÇÃO · 61 inscrições confirmadas · Atualizado automaticamente
   </div>
 
 </div>
 <script>
-function initCharts() {
-  Chart.defaults.color = '#8b949e';
-  Chart.defaults.font.family = "'Outfit', sans-serif";
+var faixasLabels = ["Crian\u00e7a (0\u201312)", "Adolesc. (13\u201317)", "Jovem (18\u201325)", "Adulto (26\u201335)", "Adulto+ (36+)"];
+var faixasValues = [11, 7, 10, 18, 15];
+var pagLabels    = ["\u00c0 Vista", "Camp. Completo PIX", "Parcelado 5x", "Cart\u00e3o", "Di\u00e1ria PIX"];
+var pagValues    = [18, 17, 12, 8, 6];
+var totalInscritos = 61;
 
+Chart.defaults.color = '#8b949e';
+Chart.defaults.font.family = "'Outfit', sans-serif";
+
+function initCharts() {
   var canvasAge = document.getElementById('chartAge');
   var canvasPay = document.getElementById('chartPay');
-
-  // iOS Safari fix: force canvas pixel dimensions from parent
   function sizeCanvas(canvas) {
     var parent = canvas.parentElement;
     var w = parent.offsetWidth || 300;
     var h = parent.offsetHeight || 230;
-    canvas.width = w * (window.devicePixelRatio || 1);
+    canvas.width  = w * (window.devicePixelRatio || 1);
     canvas.height = h * (window.devicePixelRatio || 1);
-    canvas.style.width = w + 'px';
+    canvas.style.width  = w + 'px';
     canvas.style.height = h + 'px';
   }
   sizeCanvas(canvasAge);
@@ -421,21 +351,20 @@ function initCharts() {
   new Chart(canvasAge.getContext('2d'), {
     type: 'bar',
     data: {
-      labels: ['Criança\n(0–12)', 'Adolesc.\n(13–17)', 'Jovem\n(18–25)', 'Adulto\n(26–35)', 'Adulto+\n(36+)'],
+      labels: faixasLabels,
       datasets: [{
-        data: [11, 7, 10, 18, 15],
-        backgroundColor: ['rgba(79,195,247,0.7)','rgba(167,139,250,0.7)','rgba(61,220,132,0.7)','rgba(246,201,14,0.8)','rgba(255,107,107,0.7)'],
-        borderColor: ['#4fc3f7','#a78bfa','#3ddc84','#f6c90e','#ff6b6b'],
-        borderWidth: 1.5,
-        borderRadius: 6,
+        data: faixasValues,
+        backgroundColor: ['rgba(79,195,247,.7)','rgba(167,139,250,.7)','rgba(61,220,132,.7)','rgba(246,201,14,.8)','rgba(255,107,107,.7)'],
+        borderColor:     ['#4fc3f7','#a78bfa','#3ddc84','#f6c90e','#ff6b6b'],
+        borderWidth: 1.5, borderRadius: 6
       }]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(ctx) { return ' ' + ctx.raw + ' inscritos'; } } } },
       scales: {
-        x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { font: { size: 11 }, color: '#8b949e' } },
-        y: { grid: { color: 'rgba(255,255,255,0.06)' }, ticks: { font: { size: 11 }, color: '#8b949e', stepSize: 5 }, beginAtZero: true, max: 22 }
+        x: { grid: { color: 'rgba(255,255,255,.04)' }, ticks: { font: { size: 11 }, color: '#8b949e' } },
+        y: { grid: { color: 'rgba(255,255,255,.06)' }, ticks: { font: { size: 11 }, color: '#8b949e', stepSize: 5 }, beginAtZero: true }
       }
     }
   });
@@ -443,20 +372,18 @@ function initCharts() {
   new Chart(canvasPay.getContext('2d'), {
     type: 'doughnut',
     data: {
-      labels: ['À Vista', 'Camp. Completo PIX', 'Parcelado 5x', 'Cartão', 'Diária PIX'],
+      labels: pagLabels,
       datasets: [{
-        data: [18, 17, 12, 8, 6],
-        backgroundColor: ['rgba(246,201,14,0.8)','rgba(61,220,132,0.75)','rgba(79,195,247,0.75)','rgba(167,139,250,0.75)','rgba(255,107,107,0.75)'],
-        borderColor: 'rgba(22,27,34,0.8)',
-        borderWidth: 2,
-        hoverOffset: 6
+        data: pagValues,
+        backgroundColor: ['rgba(246,201,14,.8)','rgba(61,220,132,.75)','rgba(79,195,247,.75)','rgba(167,139,250,.75)','rgba(255,107,107,.75)'],
+        borderColor: 'rgba(22,27,34,.8)', borderWidth: 2, hoverOffset: 6
       }]
     },
     options: {
       responsive: true, maintainAspectRatio: false, cutout: '62%',
       plugins: {
         legend: { position: 'bottom', labels: { font: { size: 11 }, color: '#8b949e', padding: 10, boxWidth: 10, boxHeight: 10 } },
-        tooltip: { callbacks: { label: function(ctx) { return ' ' + ctx.raw + ' inscritos (' + Math.round(ctx.raw/61*100) + '%)'; } } }
+        tooltip: { callbacks: { label: function(ctx) { return ' ' + ctx.raw + ' inscritos (' + Math.round(ctx.raw/totalInscritos*100) + '%)'; } } }
       }
     }
   });
