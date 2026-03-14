@@ -3,7 +3,7 @@ name: Atualizar Dashboard
 on:
   push:
     paths:
-      - 'dados/inscricoes.xlsx'
+      - 'dados/123.xlsx'
   workflow_dispatch:
 
 jobs:
