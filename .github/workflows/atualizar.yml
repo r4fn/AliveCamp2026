@@ -3,7 +3,7 @@ name: Atualizar Dashboard
 on:
   push:
     paths:
-      - 'dados/inscricoes.xlsx'   # Dispara só quando a planilha mudar
+      - 'dados/123.xlsx'   # Dispara só quando a planilha mudar
 
 jobs:
   gerar:
