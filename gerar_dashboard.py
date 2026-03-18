@@ -4,7 +4,10 @@ import sys
 import requests
 import io
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
+
+# ── Fuso horário de Brasília (UTC-3) ──────────────────────────────────────────
+BRT = timezone(timedelta(hours=-3))
 
 # ── Lê a planilha do Google Sheets ────────────────────────────────────────────
 SHEET_ID  = "140l8Dxbzt6sRl4i34XzbM0iQiXkJ83Nu3e_3bCwJDA4"
@@ -18,8 +21,9 @@ if response.status_code != 200:
 
 print(f"✅ Planilha baixada ({len(response.content) // 1024} KB)")
 
-timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
-data_exibir = datetime.now().strftime('%d/%m/%Y %H:%M')
+timestamp    = datetime.now(BRT).strftime('%Y%m%d%H%M%S')
+data_exibir  = datetime.now(BRT).strftime('%d/%m/%Y %H:%M')
+hoje         = datetime.now(BRT).replace(tzinfo=None)
 
 df = pd.read_excel(io.BytesIO(response.content))
 
@@ -29,7 +33,7 @@ real = df[df['Carimbo de data/hora'].notna()].copy()
 # ── Métricas principais ────────────────────────────────────────────────────────
 total_inscritos = len(real)
 
-# Financeiro (inclui linhas de notas avulsas)
+# Financeiro
 total_pago     = df['Valores Pagos'].fillna(0).sum()
 total_falta    = df['Falta pagar'].fillna(0).sum()
 total_previsto = total_pago + total_falta
@@ -76,6 +80,20 @@ timeline_data = [
     for _, row in timeline.iterrows()
 ]
 
+# ── Estatísticas de prazo ──────────────────────────────────────────────────────
+DATA_CAMP      = datetime(2026, 4, 3, 8, 0, 0)
+delta          = DATA_CAMP - hoje
+dias_restantes = max(0, delta.days)
+camp_ts_ms     = int(DATA_CAMP.timestamp() * 1000)  # para o JS
+
+primeira_inscricao = real['Carimbo de data/hora'].min() if total_inscritos > 0 else hoje
+dias_campanha      = max(1, (hoje - primeira_inscricao).days)
+media_dia          = round(total_inscritos / dias_campanha, 1)
+projecao_inscritos = total_inscritos + round(media_dia * dias_restantes)
+
+media_pago_inscrito = round(total_pago / total_inscritos, 2) if total_inscritos > 0 else 0
+receita_projetada   = round(media_pago_inscrito * projecao_inscritos)
+
 # ── Percentuais ───────────────────────────────────────────────────────────────
 pct_pago  = round(total_pago  / total_previsto * 100) if total_previsto > 0 else 0
 pct_falta = round(total_falta / total_previsto * 100) if total_previsto > 0 else 0
@@ -83,8 +101,10 @@ pct_falta = round(total_falta / total_previsto * 100) if total_previsto > 0 else
 igreja_lider = list(igrejas.keys())[0] if igrejas else "—"
 pct_lider    = round(list(igrejas.values())[0] / total_inscritos * 100) if total_inscritos > 0 else 0
 
-ultimos = timeline_data[-2:] if len(timeline_data) >= 2 else timeline_data
-pct_ultimos = round(sum(m['count'] for m in ultimos) / total_inscritos * 100) if total_inscritos > 0 else 0
+ultimos2 = timeline_data[-2:] if len(timeline_data) >= 2 else timeline_data
+pct_ultimos2 = round(sum(m['count'] for m in ultimos2) / total_inscritos * 100) if total_inscritos > 0 else 0
+
+# ── HTML blocks ───────────────────────────────────────────────────────────────
 
 # Igrejas HTML
 igrejas_html = ""
@@ -149,7 +169,9 @@ html = f"""<!DOCTYPE html>
     radial-gradient(ellipse at 80% 80%,rgba(61,220,132,.05) 0%,transparent 50%);
     pointer-events:none;z-index:0}}
   .container{{max-width:1280px;margin:0 auto;padding:40px 24px;position:relative;z-index:1}}
-  .header{{text-align:center;margin-bottom:48px}}
+
+  /* ── HEADER ── */
+  .header{{text-align:center;margin-bottom:40px}}
   .header-badge{{display:inline-block;font-family:'DM Mono',monospace;font-size:11px;letter-spacing:3px;
     text-transform:uppercase;color:var(--gold);border:1px solid rgba(246,201,14,.3);
     padding:6px 18px;border-radius:20px;margin-bottom:16px;background:rgba(246,201,14,.05)}}
@@ -159,6 +181,78 @@ html = f"""<!DOCTYPE html>
   .header-sub{{font-size:15px;color:var(--muted);letter-spacing:1px;font-weight:300}}
   .header-line{{width:80px;height:3px;background:linear-gradient(90deg,var(--gold),var(--green));
     margin:20px auto 0;border-radius:2px}}
+
+  /* ── COUNTDOWN ── */
+  .countdown-wrap{{
+    background:var(--surface);border:1px solid rgba(246,201,14,.25);border-radius:20px;
+    padding:32px 24px 28px;margin-bottom:24px;text-align:center;
+    position:relative;overflow:hidden;animation:fadeUp .4s ease both;
+  }}
+  .countdown-wrap::before{{
+    content:'';position:absolute;inset:0;
+    background:radial-gradient(ellipse at 50% 0%,rgba(246,201,14,.07) 0%,transparent 70%);
+    pointer-events:none;
+  }}
+  .countdown-label{{
+    font-family:'DM Mono',monospace;font-size:11px;letter-spacing:3px;
+    text-transform:uppercase;color:var(--gold);margin-bottom:20px;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+  }}
+  .countdown-label::before,.countdown-label::after{{
+    content:'';flex:1;max-width:80px;height:1px;
+    background:linear-gradient(90deg,transparent,rgba(246,201,14,.4));
+  }}
+  .countdown-label::after{{transform:scaleX(-1)}}
+  .countdown-units{{
+    display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;
+  }}
+  .cd-unit{{
+    background:var(--surface2);border:1px solid var(--border);border-radius:14px;
+    padding:18px 20px 14px;min-width:90px;position:relative;overflow:hidden;
+  }}
+  .cd-unit::before{{
+    content:'';position:absolute;top:0;left:0;right:0;height:2px;
+    background:linear-gradient(90deg,var(--gold),var(--green));
+  }}
+  .cd-num{{
+    font-family:'Playfair Display',serif;font-size:48px;font-weight:900;line-height:1;
+    color:var(--gold);display:block;
+    text-shadow:0 0 30px rgba(246,201,14,.3);
+  }}
+  .cd-sep{{
+    font-family:'Playfair Display',serif;font-size:36px;font-weight:900;
+    color:rgba(246,201,14,.4);align-self:flex-start;margin-top:12px;
+    animation:pulse 1s ease-in-out infinite;
+  }}
+  .cd-lbl{{
+    font-family:'DM Mono',monospace;font-size:10px;letter-spacing:2px;
+    text-transform:uppercase;color:var(--muted);margin-top:6px;display:block;
+  }}
+  .countdown-date{{
+    margin-top:18px;font-size:13px;color:var(--muted);font-family:'DM Mono',monospace;
+    letter-spacing:1px;
+  }}
+  .countdown-date strong{{color:var(--text)}}
+
+  /* ── PRAZO STATS ── */
+  .section-title{{
+    font-family:'DM Mono',monospace;font-size:10px;letter-spacing:3px;
+    text-transform:uppercase;color:var(--muted);margin-bottom:14px;
+    display:flex;align-items:center;gap:10px;
+  }}
+  .section-title::after{{content:'';flex:1;height:1px;background:var(--border)}}
+  .prazo-grid{{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}}
+  .prazo-card{{
+    background:var(--surface2);border:1px solid var(--border);border-radius:14px;
+    padding:18px 20px;animation:fadeUp .5s .1s ease both;
+    display:flex;flex-direction:column;gap:6px;
+  }}
+  .prazo-icon{{font-size:20px}}
+  .prazo-value{{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;line-height:1}}
+  .prazo-label{{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}}
+  .prazo-sub{{font-size:11px;color:var(--muted);margin-top:2px}}
+
+  /* ── HERO CARDS ── */
   .hero-grid{{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}}
   .hero-card{{background:var(--surface);border:1px solid var(--border);border-radius:16px;
     padding:24px;position:relative;overflow:hidden;transition:transform .2s,border-color .2s;
@@ -232,11 +326,17 @@ html = f"""<!DOCTYPE html>
   .footer{{text-align:center;padding:28px 0 12px;font-size:11px;color:var(--muted);
     font-family:'DM Mono',monospace;border-top:1px solid var(--border);
     margin-top:8px;letter-spacing:1px}}
+
   @keyframes fadeUp{{from{{opacity:0;transform:translateY(18px)}}to{{opacity:1;transform:translateY(0)}}}}
+  @keyframes flipIn{{from{{opacity:0;transform:translateY(-8px)}}to{{opacity:1;transform:translateY(0)}}}}
+  @keyframes pulse{{0%,100%{{opacity:.4}}50%{{opacity:1}}}}
+
   @media(max-width:900px){{
-    .hero-grid{{grid-template-columns:repeat(2,1fr)}}
+    .hero-grid,.prazo-grid{{grid-template-columns:repeat(2,1fr)}}
     .grid-wide,.grid-2{{grid-template-columns:1fr}}
     .insights-grid{{grid-template-columns:1fr}}
+    .cd-num{{font-size:36px}}
+    .cd-unit{{min-width:72px;padding:14px 12px 10px}}
   }}
 </style>
 </head>
@@ -250,6 +350,66 @@ html = f"""<!DOCTYPE html>
     <div class="header-line"></div>
   </header>
 
+  <!-- COUNTDOWN -->
+  <div class="countdown-wrap">
+    <div class="countdown-label">🏕️ Faltam para o acampamento</div>
+    <div class="countdown-units">
+      <div class="cd-unit">
+        <span class="cd-num" id="cd-days">--</span>
+        <span class="cd-lbl">dias</span>
+      </div>
+      <div class="cd-sep">:</div>
+      <div class="cd-unit">
+        <span class="cd-num" id="cd-hours">--</span>
+        <span class="cd-lbl">horas</span>
+      </div>
+      <div class="cd-sep">:</div>
+      <div class="cd-unit">
+        <span class="cd-num" id="cd-mins">--</span>
+        <span class="cd-lbl">minutos</span>
+      </div>
+      <div class="cd-sep">:</div>
+      <div class="cd-unit">
+        <span class="cd-num" id="cd-secs">--</span>
+        <span class="cd-lbl">segundos</span>
+      </div>
+    </div>
+    <div class="countdown-date">
+      📅 <strong>03 de Abril de 2026</strong> &nbsp;·&nbsp; ALIVE CAMP 12ª Edição
+    </div>
+  </div>
+
+  <!-- PRAZO STATS -->
+  <div class="section-title">📈 Projeções com base nos dias restantes</div>
+  <div class="prazo-grid">
+    <div class="prazo-card">
+      <span class="prazo-icon">⏰</span>
+      <span class="prazo-value" style="color:var(--gold)">{dias_restantes}</span>
+      <span class="prazo-label">Dias restantes</span>
+      <span class="prazo-sub">até 03/04/2026</span>
+    </div>
+    <div class="prazo-card">
+      <span class="prazo-icon">📥</span>
+      <span class="prazo-value" style="color:var(--sky)">{media_dia}</span>
+      <span class="prazo-label">Inscrições / dia</span>
+      <span class="prazo-sub">média desde o início</span>
+    </div>
+    <div class="prazo-card">
+      <span class="prazo-icon">🎯</span>
+      <span class="prazo-value" style="color:var(--green)">{projecao_inscritos}</span>
+      <span class="prazo-label">Projeção de inscritos</span>
+      <span class="prazo-sub">se ritmo se mantiver</span>
+    </div>
+    <div class="prazo-card">
+      <span class="prazo-icon">💹</span>
+      <span class="prazo-value" style="color:var(--purple)">R${receita_projetada:,.0f}</span>
+      <span class="prazo-label">Receita projetada</span>
+      <span class="prazo-sub">baseado na média atual</span>
+    </div>
+  </div>
+
+  <!-- INSCRIÇÕES ATUAIS -->
+  <div class="section-title">🏕️ Situação atual</div>
   <div class="hero-grid">
     <div class="hero-card gold">
       <span class="hero-icon">🏕️</span>
@@ -285,7 +445,7 @@ html = f"""<!DOCTYPE html>
       <span class="insight-icon">📅</span>
       <div class="insight-text">
         <strong>Corrida de última hora</strong>
-        {ultimos[-1]['label'] if ultimos else '—'} e {ultimos[-2]['label'] if len(ultimos)>1 else '—'} concentram {pct_ultimos}% das inscrições
+        {ultimos2[-1]['label'] if ultimos2 else '—'} e {ultimos2[-2]['label'] if len(ultimos2)>1 else '—'} concentram {pct_ultimos2}% das inscrições
       </div>
     </div>
     <div class="insight-pill">
@@ -376,12 +536,48 @@ html = f"""<!DOCTYPE html>
 
 </div>
 <script>
-var faixasLabels = {faixas_labels};
-var faixasValues = {faixas_values};
-var pagLabels    = {pag_labels};
-var pagValues    = {pag_values};
+var faixasLabels   = {faixas_labels};
+var faixasValues   = {faixas_values};
+var pagLabels      = {pag_labels};
+var pagValues      = {pag_values};
 var totalInscritos = {total_inscritos};
+var campTS         = {camp_ts_ms};
 
+// ── Countdown ────────────────────────────────────────────────────────────────
+function pad(n) {{ return String(n).padStart(2, '0'); }}
+
+function updateCountdown() {{
+  var diff = campTS - Date.now();
+  if (diff <= 0) {{
+    ['cd-days','cd-hours','cd-mins','cd-secs'].forEach(function(id) {{
+      document.getElementById(id).textContent = '00';
+    }});
+    return;
+  }}
+  var s   = Math.floor(diff / 1000);
+  var d   = Math.floor(s / 86400);
+  var h   = Math.floor((s % 86400) / 3600);
+  var m   = Math.floor((s % 3600) / 60);
+  var sec = s % 60;
+
+  function flip(id, val) {{
+    var el = document.getElementById(id);
+    if (el.textContent !== val) {{
+      el.style.animation = 'none';
+      el.textContent = val;
+      void el.offsetWidth;
+      el.style.animation = 'flipIn .25s ease';
+    }}
+  }}
+  flip('cd-days',  pad(d));
+  flip('cd-hours', pad(h));
+  flip('cd-mins',  pad(m));
+  flip('cd-secs',  pad(sec));
+}}
+updateCountdown();
+setInterval(updateCountdown, 1000);
+
+// ── Charts ───────────────────────────────────────────────────────────────────
 Chart.defaults.color = '#8b949e';
 Chart.defaults.font.family = "'Outfit', sans-serif";
 
@@ -444,7 +640,7 @@ if (document.readyState === 'loading') {{
   initCharts();
 }}
 
-// Auto-reload quando site atualizar
+// ── Auto-reload quando site atualizar ────────────────────────────────────────
 document.addEventListener('visibilitychange', function() {{
   if (!document.hidden) {{
     fetch(window.location.href + '?nocache=' + Date.now(), {{ cache: 'no-store' }})
