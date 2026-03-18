@@ -1,19 +1,27 @@
 import pandas as pd
 import json
 import sys
+import requests
+import io
 from pathlib import Path
 from datetime import datetime
 
-# ── Lê a planilha ─────────────────────────────────────────────────────────────
-xlsx_path = Path("dados/123.xlsx")
-if not xlsx_path.exists():
-    print("ERRO: arquivo dados/123.xlsx não encontrado.")
+# ── Lê a planilha do Google Sheets ────────────────────────────────────────────
+SHEET_ID  = "140l8Dxbzt6sRl4i34XzbM0iQiXkJ83Nu3e_3bCwJDA4"
+SHEET_URL = f"https://docs.google.com/spreadsheets/d/{SHEET_ID}/export?format=xlsx"
+
+print(f"⬇️  Baixando planilha do Google Sheets...")
+response = requests.get(SHEET_URL, timeout=30)
+if response.status_code != 200:
+    print(f"ERRO: não conseguiu baixar a planilha (HTTP {response.status_code})")
     sys.exit(1)
+
+print(f"✅ Planilha baixada ({len(response.content) // 1024} KB)")
 
 timestamp = datetime.now().strftime('%Y%m%d%H%M%S')
 data_exibir = datetime.now().strftime('%d/%m/%Y %H:%M')
 
-df = pd.read_excel(xlsx_path)
+df = pd.read_excel(io.BytesIO(response.content))
 
 # Filtra apenas inscrições reais (com timestamp)
 real = df[df['Carimbo de data/hora'].notna()].copy()
