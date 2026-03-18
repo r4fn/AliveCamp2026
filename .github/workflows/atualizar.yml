@@ -2,8 +2,10 @@ name: Atualizar Dashboard
 
 on:
   push:
-    paths:
-      - 'dados/123.xlsx'   # Dispara só quando a planilha mudar
+    branches: [main]           # Roda a cada push na main
+  schedule:
+    - cron: '0 */6 * * *'      # Roda automaticamente a cada 6 horas
+  workflow_dispatch:           # Permite rodar manualmente pela aba Actions
 
 jobs:
   gerar:
@@ -21,7 +23,7 @@ jobs:
           python-version: '3.11'
 
       - name: Instalar dependências
-        run: pip install pandas openpyxl
+        run: pip install pandas openpyxl requests
 
       - name: Gerar index.html
         run: python gerar_dashboard.py
